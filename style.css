@@ -1,0 +1,573 @@
+/* ==========================================================================
+   Super Piškvorky (3×3)² - Ultimate Tic-Tac-Toe
+   Modern Dark Gaming & Glassmorphism Theme
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    /* Color Palette */
+    --bg-main: #0a0e17;
+    --bg-radial: radial-gradient(circle at 50% 20%, rgba(30, 58, 138, 0.25) 0%, rgba(10, 14, 23, 0) 70%);
+    --bg-panel: rgba(18, 25, 42, 0.72);
+    --bg-panel-border: rgba(255, 255, 255, 0.08);
+    --bg-panel-glow: rgba(56, 189, 248, 0.06);
+
+    --bg-board: rgba(13, 20, 36, 0.88);
+    --bg-board-border: rgba(255, 255, 255, 0.07);
+
+    --bg-cell: rgba(255, 255, 255, 0.035);
+    --bg-cell-hover: rgba(56, 189, 248, 0.12);
+    --bg-cell-border: rgba(255, 255, 255, 0.06);
+
+    /* Player X (Cyan / Neon Blue) */
+    --color-x: #00f2fe;
+    --color-x-alt: #4facfe;
+    --color-x-glow: rgba(0, 242, 254, 0.45);
+    --color-x-bg: rgba(0, 242, 254, 0.1);
+
+    /* Player O (Coral / Neon Red-Pink) */
+    --color-o: #ff3366;
+    --color-o-alt: #ff6b8b;
+    --color-o-glow: rgba(255, 51, 102, 0.45);
+    --color-o-bg: rgba(255, 51, 102, 0.1);
+
+    /* Active & Highlight States */
+    --color-active: #38bdf8;
+    --color-active-glow: rgba(56, 189, 248, 0.4);
+
+    /* Typography */
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+
+    /* Sizing & Geometry */
+    --cell-size: 46px;
+    --cell-gap: 5px;
+    --board-gap: 14px;
+    --board-padding: 10px;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+}
+
+/* Base Styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56, 189, 248, 0.15), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 51, 102, 0.12), transparent 70%),
+        linear-gradient(180deg, #0a0e17 0%, #070a10 100%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px 60px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Ambient Background Grid Pattern */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Header & Titles */
+.game-header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.game-title {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.game-badge {
+    display: inline-block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(255, 51, 102, 0.15));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    -webkit-text-fill-color: initial;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.game-subtitle {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* Top Dashboard Layout (Turn info & Mini-map overview) */
+.dashboard-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+    max-width: 900px;
+    width: 100%;
+}
+
+.dashboard-card {
+    background: var(--bg-panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--bg-panel-border);
+    border-radius: var(--radius-md);
+    padding: 14px 22px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+}
+
+/* Turn Indicator #info */
+#info {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    font-size: 1.3rem;
+    font-weight: 900;
+    text-shadow: 0 0 12px currentColor;
+    transition: all 0.25s ease;
+}
+
+.player-tag.tag-x {
+    background: var(--color-x-bg);
+    color: var(--color-x);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    box-shadow: 0 0 14px var(--color-x-glow);
+}
+
+.player-tag.tag-o {
+    background: var(--color-o-bg);
+    color: var(--color-o);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    box-shadow: 0 0 14px var(--color-o-glow);
+}
+
+/* Main Board (Mini-map / Macro-board overview) */
+.main-board-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.main-board {
+    display: grid;
+    grid-template-columns: repeat(3, 34px);
+    gap: 4px;
+    padding: 6px;
+    background: rgba(10, 15, 28, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.main-board .cell {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+    font-weight: 800;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    cursor: default;
+}
+
+.main-board .cell.active-target {
+    border-color: var(--color-active);
+    background: rgba(56, 189, 248, 0.15);
+    box-shadow: 0 0 8px var(--color-active-glow);
+}
+
+.main-board .cell.won-x {
+    color: var(--color-x);
+    background: var(--color-x-bg);
+    border-color: var(--color-x);
+    box-shadow: 0 0 10px var(--color-x-glow);
+}
+
+.main-board .cell.won-o {
+    color: var(--color-o);
+    background: var(--color-o-bg);
+    border-color: var(--color-o);
+    box-shadow: 0 0 10px var(--color-o-glow);
+}
+
+.main-board .cell.draw {
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Main Ultimate Grid: 3x3 of Small Boards */
+.boards-container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: var(--board-gap);
+    justify-content: center;
+    margin: 0 auto 30px;
+    padding: 14px;
+    background: rgba(15, 22, 38, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Individual 3x3 Mini Board */
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, var(--cell-size));
+    gap: var(--cell-gap);
+    padding: var(--board-padding);
+    background: var(--bg-board);
+    border: 1.5px solid var(--bg-board-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    position: relative;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease;
+}
+
+/* Active board (highlighted where the player is forced to play) */
+.board.active,
+.board.highlight {
+    border-color: var(--color-active);
+    background: rgba(18, 28, 48, 0.95);
+    box-shadow:
+        0 0 24px rgba(56, 189, 248, 0.3),
+        inset 0 0 15px rgba(56, 189, 248, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Big Winning Overlays for Individual Boards */
+.board.won-x::after,
+.board.won-o::after,
+.board.draw::after {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 82px;
+    font-weight: 900;
+    border-radius: calc(var(--radius-md) - 1.5px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 10;
+    animation: zoomPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    pointer-events: none;
+}
+
+.board.won-x::after {
+    content: 'X';
+    color: var(--color-x);
+    background: rgba(10, 16, 28, 0.88);
+    border: 2px solid var(--color-x);
+    text-shadow: 0 0 25px var(--color-x-glow);
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.25);
+}
+
+.board.won-o::after {
+    content: 'O';
+    color: var(--color-o);
+    background: rgba(18, 10, 20, 0.88);
+    border: 2px solid var(--color-o);
+    text-shadow: 0 0 25px var(--color-o-glow);
+    box-shadow: 0 0 30px rgba(255, 51, 102, 0.25);
+}
+
+.board.draw::after {
+    content: '-';
+    color: var(--text-muted);
+    background: rgba(15, 20, 32, 0.9);
+    border: 1px solid var(--text-dim);
+    font-size: 60px;
+}
+
+.board.disabled {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+/* Individual Cell */
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    font-size: 26px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-cell);
+    border: 1px solid var(--bg-cell-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        color 0.2s ease;
+}
+
+/* Cell Hover on Empty Cells */
+.board:not(.disabled) .cell:empty:hover {
+    background: var(--bg-cell-hover);
+    border-color: rgba(56, 189, 248, 0.35);
+    transform: scale(1.06);
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.18);
+    z-index: 2;
+}
+
+.board:not(.disabled) .cell:empty:active {
+    transform: scale(0.95);
+}
+
+/* Cell Value Styling (X / O) */
+.cell.x,
+.cell[data-player="X"] {
+    color: var(--color-x);
+    text-shadow: 0 0 10px var(--color-x-glow);
+    background: rgba(0, 242, 254, 0.04);
+    border-color: rgba(0, 242, 254, 0.2);
+    animation: markPop 0.2s ease-out;
+}
+
+.cell.o,
+.cell[data-player="O"] {
+    color: var(--color-o);
+    text-shadow: 0 0 10px var(--color-o-glow);
+    background: rgba(255, 51, 102, 0.04);
+    border-color: rgba(255, 51, 102, 0.2);
+    animation: markPop 0.2s ease-out;
+}
+
+/* Controls & Buttons */
+.controls-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15));
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #ffffff;
+    padding: 12px 28px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button::before {
+    content: '↺';
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: transform 0.4s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(99, 102, 241, 0.3));
+    border-color: rgba(56, 189, 248, 0.85);
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+    transform: translateY(-2px);
+}
+
+button:hover::before {
+    transform: rotate(-180deg);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Animations */
+@keyframes zoomPop {
+    0% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes markPop {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments for mobile and tablets */
+@media (max-width: 680px) {
+    :root {
+        --cell-size: 34px;
+        --cell-gap: 3px;
+        --board-gap: 8px;
+        --board-padding: 6px;
+    }
+
+    body {
+        padding: 16px 8px 40px;
+    }
+
+    .game-header {
+        margin-bottom: 16px;
+    }
+
+    .dashboard-container {
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .dashboard-card {
+        padding: 10px 16px;
+    }
+
+    #info {
+        font-size: 1.1rem;
+    }
+
+    .boards-container {
+        padding: 8px;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .cell {
+        font-size: 20px;
+    }
+
+    .board.won-x::after,
+    .board.won-o::after {
+        font-size: 60px;
+    }
+}
+
+@media (max-width: 400px) {
+    :root {
+        --cell-size: 28px;
+        --cell-gap: 2px;
+        --board-gap: 5px;
+        --board-padding: 4px;
+    }
+
+    .cell {
+        font-size: 16px;
+    }
+
+    .board.won-x::after,
+    .board.won-o::after {
+        font-size: 48px;
+    }
+}
