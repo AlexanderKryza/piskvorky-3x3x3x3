@@ -34,6 +34,7 @@ boards.forEach((board) => {
     cells.forEach((cell) => {
         cell.addEventListener('click', () => {
             // Lze hrát jen v aktuální desce, do volného pole a dokud hra neskončila
+            //Použito: AI Gemini 3.8 Flash, spravne parametry ifu
             if (isGameOver || boardIndex !== currentBoard || cell.textContent !== '') {
                 return;
             }
@@ -73,6 +74,7 @@ function checkWin(cells, player) {
 }
 
 function isBoardFull(cells) {
+    //Použito: AI Gemini 3.8 Flash, pomoc syntaxe
     return Array.from(cells).every(cell => cell.textContent !== '');
 }
 
