@@ -1,0 +1,289 @@
+:root {
+    --bg-body: #111827;
+    --bg-card: #1f2937;
+    --bg-cell: #111827;
+    --bg-cell-hover: #374151;
+    --border-color: #374151;
+    --text-color: #f9fafb;
+    --text-muted: #9ca3af;
+    --color-x: #38bdf8;
+    --color-o: #f43f5e;
+    --color-active: #38bdf8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background-color: var(--bg-body);
+    color: var(--text-color);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 40px;
+}
+
+/* Hlavička */
+.game-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.game-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+/* Horní panel */
+.dashboard-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.dashboard-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.dashboard-card-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+#info {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.player-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.player-tag.tag-x {
+    color: var(--color-x);
+    background: rgba(56, 189, 248, 0.15);
+}
+
+.player-tag.tag-o {
+    color: var(--color-o);
+    background: rgba(244, 63, 94, 0.15);
+}
+
+/* velka pole (miniatura 3x3) */
+.main-board {
+    display: grid;
+    grid-template-columns: repeat(3, 30px);
+    gap: 4px;
+}
+
+.main-board .cell {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 4px;
+    background: var(--bg-cell);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+}
+
+.main-board .cell.active-target {
+    border: 2px solid var(--color-active);
+    background: rgba(56, 189, 248, 0.1);
+}
+
+.main-board .cell.won-x {
+    color: var(--color-x);
+    background: rgba(56, 189, 248, 0.15);
+}
+
+.main-board .cell.won-o {
+    color: var(--color-o);
+    background: rgba(244, 63, 94, 0.15);
+}
+
+.main-board .cell.draw {
+    color: var(--text-muted);
+}
+
+/* Mřížka 3x3 male boxy */
+.boards-container {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+/* Jedna malá deska 3x3 */
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 44px);
+    gap: 4px;
+    padding: 8px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    position: relative;
+}
+
+/* Aktivní deska */
+.board.active {
+    border-color: var(--color-active);
+    opacity: 1;
+}
+
+/* Neaktivní desky */
+.board:not(.active) {
+    opacity: 0.45;
+}
+
+/* Překrytí vyhrané desky */
+.board.won-x::after,
+.board.won-o::after,
+.board.draw::after {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 76px;
+    font-weight: 800;
+    border-radius: 6px;
+    background: rgba(17, 24, 39, 0.92);
+    user-select: none;
+    pointer-events: none;
+}
+
+.board.won-x::after {
+    content: 'X';
+    color: var(--color-x);
+}
+
+.board.won-o::after {
+    content: 'O';
+    color: var(--color-o);
+}
+
+.board.draw::after {
+    content: '-';
+    color: var(--text-muted);
+    font-size: 50px;
+}
+
+.board.disabled {
+    pointer-events: none;
+}
+
+/* Jednotlivá buňka */
+.cell {
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-cell);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    cursor: default;
+    user-select: none;
+}
+
+/* Hover na prázdné buňce v aktivní desce */
+.board.active:not(.disabled) .cell:empty {
+    cursor: pointer;
+}
+
+.board.active:not(.disabled) .cell:empty:hover {
+    background: var(--bg-cell-hover);
+}
+
+/* Značka hráče X a O */
+.cell.x {
+    color: var(--color-x);
+}
+
+.cell.o {
+    color: var(--color-o);
+}
+
+/* Tlačítko resetu */
+.controls-container {
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    background: #374151;
+    border: 1px solid #4b5563;
+    color: #ffffff;
+    padding: 10px 22px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4b5563;
+}
+
+/* Responzivita */
+@media (max-width: 600px) {
+    .board {
+        grid-template-columns: repeat(3, 34px);
+        gap: 3px;
+        padding: 6px;
+    }
+
+    .cell {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+
+    .boards-container {
+        gap: 8px;
+    }
+
+    .board.won-x::after,
+    .board.won-o::after {
+        font-size: 54px;
+    }
+}
